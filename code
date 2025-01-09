@@ -34,7 +34,7 @@ void setup() {
 
 
   // Start Bluetooth Serial with a name for the ESP32
-  SerialBT.begin("ESP32CAR");
+  SerialBT.begin("STEMbotix");
   Serial.println("The device started, now you can pair it with Bluetooth!");
 }
 
