@@ -1,5 +1,4 @@
 #include "BluetoothSerial.h"  // Include Bluetooth Serial library
-#include <ESP32Servo.h>        // Include ESP32 Servo library
 
 // Initialize Bluetooth Serial
 BluetoothSerial SerialBT;
@@ -14,14 +13,8 @@ BluetoothSerial SerialBT;
 #define MOTOR_BR1 4 // Back-right motor IN1
 #define MOTOR_BR2 2  // Back-right motor IN2
 
-// Servo Pin
-#define SERVO_PIN 14
-
-Servo myServo;       // Create a servo object
-int servoPosition = 0; // Variable to store servo position
 
 // Define PWM channels
-const int servoChannel = 0;  // Channel for servo
 const int pwmChannel = 1;    // Channel for analog-like signal
 
 char command;  // Variable to store incoming Bluetooth command
@@ -36,10 +29,7 @@ void setup() {
   pinMode(MOTOR_BL2, OUTPUT);
   pinMode(MOTOR_BR1, OUTPUT);
   pinMode(MOTOR_BR2, OUTPUT);
-
-  // Attach the servo to the defined pin
-  myServo.attach(SERVO_PIN);
-  myServo.write(servoPosition); // Initialize servo position
+  Serial.begin(115200);
 
   // Start Bluetooth Serial with a name for the ESP32
   SerialBT.begin("STEMbotix");
@@ -50,32 +40,23 @@ void loop() {
   // Check if there's a Bluetooth command available
   if (SerialBT.available()) {
     command = SerialBT.read();  // Read the incoming command
-
+    Serial.println("command");
     // Perform action based on command
     switch (command) {
-      case 'F':  // Forward
+      case 'u':  // Forward
         moveForward();
         break;
-      case 'B':  // Backward
+      case 'd':  // Backward
         moveBackward();
         break;
-      case 'L':  // Left
+      case 'l':  // Left
         moveLeft();
         break;
-      case 'R':  // Right
+      case 'r':  // Right
         moveRight();
         break;
-      case 'G':  // Rotate Clockwise
-        rotateClockwise();
-        break;
-      case 'I':  // Rotate Anti-clockwise
-        rotateAnticlockwise();
-        break;
-      case 'S':  // Stop
+      case 's':  // Stop
         stopMotors();
-        break;
-      case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
-        setServoPosition((command - '0') * 10); // Set servo position from 10 to 90 degrees
         break;
     }
   }
@@ -127,28 +108,6 @@ void moveRight() {
   analogWrite(MOTOR_BR2, 0);
 }
 
-void rotateClockwise() {
-  analogWrite(MOTOR_FL1, speed);
-  analogWrite(MOTOR_FL2, 0);
-  analogWrite(MOTOR_FR1, 0);
-  analogWrite(MOTOR_FR2, speed);
-  analogWrite(MOTOR_BL1, speed);
-  analogWrite(MOTOR_BL2, 0);
-  analogWrite(MOTOR_BR1, 0);
-  analogWrite(MOTOR_BR2, speed);
-}
-
-void rotateAnticlockwise() {
-  analogWrite(MOTOR_FL1, 0);
-  analogWrite(MOTOR_FL2, speed);
-  analogWrite(MOTOR_FR1, speed);
-  analogWrite(MOTOR_FR2, 0);
-  analogWrite(MOTOR_BL1, 0);
-  analogWrite(MOTOR_BL2, speed);
-  analogWrite(MOTOR_BR1, speed);
-  analogWrite(MOTOR_BR2, 0);
-}
-
 void stopMotors() {
   analogWrite(MOTOR_FL1, 0);
   analogWrite(MOTOR_FL2, 0);
@@ -160,10 +119,3 @@ void stopMotors() {
   analogWrite(MOTOR_BR2, 0);
 }
 
-void setServoPosition(int position) {
-  servoPosition = position;
-  myServo.detach();           // Detach the servo to reset
-  delay(10);                  // Small delay to ensure detachment
-  myServo.attach(SERVO_PIN);  // Reattach the servo
-  myServo.write(servoPosition);
-}
