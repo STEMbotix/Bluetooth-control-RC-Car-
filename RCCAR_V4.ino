@@ -40,7 +40,7 @@ void loop() {
   // Check if there's a Bluetooth command available
   if (SerialBT.available()) {
     command = SerialBT.read();  // Read the incoming command
-    Serial.println("command");
+    Serial.println(command);
     // Perform action based on command
     switch (command) {
       case 'u':  // Forward
